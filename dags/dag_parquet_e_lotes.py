@@ -3,7 +3,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
 # Importando as funções dos arquivos externos
-from utils.download_parquet import download_parquet_from_gcs
+from utils.download_parquet import download_parquet_from_url
 from utils.manipular_parquet import manipular_parquet
 from utils.processar_lotes import processar_lotes
 
@@ -20,14 +20,14 @@ default_args = {
 with DAG(
     'dag_parquet_e_lotes',
     default_args=default_args,
-    description='DAG que baixa Parquet do GCS e processa lotes pendentes a cada 1 hora',
+    description='DAG que baixa Parquet e processa lotes pendentes a cada 1 hora',
     schedule_interval=timedelta(hours=1),
     catchup=False
 ) as dag:
 
     baixar_parquet_task = PythonOperator(
         task_id='baixar_parquet',
-        python_callable=download_parquet_from_gcs,
+        python_callable=download_parquet_from_url,
         op_kwargs={
             'bucket_name': 'desafio-eng-dados',
             'source_blob_name': '2024-03-06.pq',
